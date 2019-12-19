@@ -68,14 +68,12 @@ fn bit_scan(data: i32) -> i32 {
 fn memchr_simd_avx2(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
     unsafe {
         use core::arch::x86_64::*;
-        use core::arch::x86_64::_mm256_movemask_epi8;
         let mut i = 0;
         while i + 32 < n {
             let q = _mm256_set1_epi8(c as i8);
             let x = _mm256_lddqu_si256(s.add(i as usize) as _);
             let r = _mm256_cmpeq_epi8(q, x);
             let z = _mm256_movemask_epi8(r);
-            println!("{:?}", r);
             if z != 0 {
                 return s.add(bit_scan(z) as usize + i as usize)
             }
@@ -100,7 +98,6 @@ fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
             let x = _mm_lddqu_si128(s.add(i as usize) as _);
             let r = _mm_cmpeq_epi8(q, x);
             let z = _mm_movemask_epi8(r);
-            println!("{:?}", r);
             if z != 0 {
                 return s.add(bit_scan(z) as usize + i as usize)
             }
