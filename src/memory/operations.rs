@@ -35,14 +35,14 @@ pub extern "C" fn memcpy (dst: *mut u8,
 simd_compiletime_generate!(
 fn memmove_simd (dst: *mut u8, src: *const u8, n: size_t) -> *mut u8 {
     if (dst as size_t) < (src as size_t) {
-        memcpy(dst, src, n)
+        memcpy_simd::<S>(dst, src, n)
     } else {
         let diff = dst as size_t - src as size_t;
         if diff > n {
-            memcpy(dst, src, n)
+            memcpy_simd::<S>(dst, src, n)
         } else {
-            memcpy(dst.add(diff as usize), dst, n - diff);
-            memcpy(dst, src, diff)
+            memcpy_simd::<S>(dst.add(diff as usize), dst, n - diff);
+            memcpy_simd::<S>(dst, src, diff)
         }
     }
 }
@@ -164,8 +164,8 @@ mod test {
     fn memchr() {
         let mut a : i32 = 0b00010000;
         let string = b"123412341234123412341234123412341234";
-        let res = super::memchr_simd_avx2(string.as_ptr() as *const i8, 50, string.len() as u64);
-        println!("{}", res as usize - string.as_ptr() as usize);
+        let res = super::memchr_simd_avx2(string.as_ptr() as *const i8, 0, string.len() as u64);
+        println!("{}", res as isize - string.as_ptr() as isize);
     }
 }
 
