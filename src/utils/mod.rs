@@ -1,1 +1,3 @@
-pub mod bitwise;
+mod bitwise;
+
+pub use bitwise::*;

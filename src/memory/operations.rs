@@ -7,57 +7,91 @@ use simdeez::sse2::*;
 use simdeez::sse41::*;
 
 use crate::types::*;
-use crate::utils::bitwise::*;
+use crate::utils::*;
 
-simd_compiletime_generate!(
-fn memcpy_simd(
+#[no_mangle]
+pub unsafe extern "C" fn memcpy_simd_avx2(
 dst: *mut u8,
 src: *const u8,
 size: size_t) -> *mut u8 {
-    let mask : size_t = (S::VI32_WIDTH << 2) as size_t - 1;
+    use core::arch::x86_64::*;
+    let mask : size_t = 31;
     let preset = mask & size;
     for i in 0..preset {
             *dst.add(i as usize) = *src.add(i as usize);
     }
-    for i in (preset..size).step_by(S::VI32_WIDTH << 2) {
-        let v = S::loadu_epi32(& *(src.add(i as usize) as *const i32));
-        S::storeu_epi32(&mut *(dst.add(i as usize) as *mut i32), v);
+    for i in (preset..size).step_by(32) {
+        let v = _mm256_lddqu_si256(& *(src.add(i as usize) as * const _));
+        _mm256_storeu_si256(&mut *(dst.add(i as usize) as *mut _), v);
     }
     dst
 }
-);
 
-pub extern "C" fn memcpy(dst: *mut u8,
+#[no_mangle]
+pub unsafe extern "C" fn memcpy_simd_sse(
+    dst: *mut u8,
+    src: *const u8,
+    size: size_t) -> *mut u8 {
+    use core::arch::x86_64::*;
+    let mask : size_t = 31;
+    let preset = mask & size;
+    for i in 0..preset {
+        *dst.add(i as usize) = *src.add(i as usize);
+    }
+    for i in (preset..size).step_by(32) {
+        let v = _mm_lddqu_si128(& *(src.add(i as usize) as * const _));
+        _mm_storeu_si128(&mut *(dst.add(i as usize) as *mut _), v);
+    }
+    dst
+}
+
+#[cfg_attr(not(test), no_mangle)]
+pub unsafe extern "C" fn memcpy(dst: *mut u8,
                          src: *const u8,
                          size: size_t) -> *mut u8 {
-    memcpy_simd_compiletime(dst, src, size)
+    memcpy_simd_avx2(dst, src, size)
 }
 
 
-simd_compiletime_generate!(
-fn memmove_simd (dst: *mut u8, src: *const u8, n: size_t) -> *mut u8 {
+#[no_mangle]
+pub unsafe extern "C" fn memmove_simd_avx2 (dst: *mut u8, src: *const u8, n: size_t) -> *mut u8 {
     if (dst as size_t) < (src as size_t) {
-        memcpy_simd::<S>(dst, src, n)
+        memcpy_simd_avx2(dst, src, n)
     } else {
         let diff = dst as size_t - src as size_t;
         if diff > n {
-            memcpy_simd::<S>(dst, src, n)
+            memcpy_simd_avx2(dst, src, n)
         } else {
-            memcpy_simd::<S>(dst.add(diff as usize), dst, n - diff);
-            memcpy_simd::<S>(dst, src, diff)
+            memcpy_simd_avx2(dst.add(diff as usize), dst, n - diff);
+            memcpy_simd_avx2(dst, src, diff)
         }
     }
 }
-);
 
+#[no_mangle]
+pub unsafe extern "C" fn memmove_simd_sse (dst: *mut u8, src: *const u8, n: size_t) -> *mut u8 {
+    if (dst as size_t) < (src as size_t) {
+        memcpy_simd_sse(dst, src, n)
+    } else {
+        let diff = dst as size_t - src as size_t;
+        if diff > n {
+            memcpy_simd_sse(dst, src, n)
+        } else {
+            memcpy_simd_sse(dst.add(diff as usize), dst, n - diff);
+            memcpy_simd_sse(dst, src, diff)
+        }
+    }
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn memmove(dst: *mut u8,
                                  src: *const u8,
                                  size: size_t) -> *mut u8 {
-    memmove_simd_compiletime(dst, src, size)
+    memmove_simd_avx2(dst, src, size)
 }
 
-
-extern "C" fn memchr_simd_avx2(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
+#[no_mangle]
+pub extern "C" fn memchr_simd_avx2(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
     unsafe {
         use core::arch::x86_64::*;
         let mut i = 0;
@@ -80,8 +114,8 @@ extern "C" fn memchr_simd_avx2(s: *const char_t, c: int_t, n: size_t) -> *const 
     }
 }
 
-
-extern "C" fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
+#[no_mangle]
+pub extern "C" fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
     unsafe {
         use core::arch::x86_64::*;
         let mut i = 0;
@@ -104,12 +138,13 @@ extern "C" fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const c
     }
 }
 
+#[no_mangle]
 pub unsafe extern "C" fn memchr(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
     if n < 32 { memchr_simd_sse(s, c, n) } else { memchr_simd_avx2(s, c, n) }
 }
 
 #[inline]
-unsafe fn short_cmp(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
+pub unsafe fn short_cmp(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
     for i in 0..n {
         let res = *s.add(i as usize) - *t.add(i as usize);
         if res != 0 {
@@ -119,7 +154,8 @@ unsafe fn short_cmp(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
     return 0;
 }
 
-unsafe fn memcmp_simd_avx2(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
+#[no_mangle]
+pub unsafe fn memcmp_simd_avx2(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
     use core::arch::x86_64::*;
     static MASK: size_t = 31;
     let preset = MASK & n;
@@ -140,13 +176,13 @@ unsafe fn memcmp_simd_avx2(s: *const char_t, t: *const char_t, n: size_t) -> i32
     return 0;
 }
 
+#[no_mangle]
 pub unsafe extern "C" fn memcmp(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
     memcmp_simd_avx2(s, t, n)
 }
 
 #[cfg(test)]
 mod test {
-    use crate::memory::operations::memcpy_simd;
     use crate::size_t;
 
     #[test]
@@ -157,7 +193,9 @@ mod test {
             a.push(i);
         }
         b.resize(a.len(), 0);
-        super::memcpy(b.as_mut_ptr() as *mut u8, a.as_mut_ptr() as *mut u8, 4 * a.len() as size_t);
+        unsafe {
+            super::memcpy(b.as_mut_ptr() as *mut u8, a.as_mut_ptr() as *mut u8, 4 * a.len() as size_t);
+        }
         assert_eq!(a, b)
     }
 

@@ -92,12 +92,30 @@ pub extern "C" fn pop_reverse(mut b: u64) -> u64 {
 }
 
 #[inline]
-pub extern "C" fn pop_count(v: u32) -> u32 {
-    let mut c : u64 = 0;
-    let v = v as u64;
-    c =  ((v & 0xfff) * 0x1001001001001 & 0x84210842108421) % 0x1f;
-    c += (((v & 0xfff000) >> 12) * 0x1001001001001 & 0x84210842108421) % 0x1f;
-    (c + (((v >> 24) * 0x1001001001001 & 0x84210842108421) % 0x1f)) as u32
+pub extern "C" fn pop_count64(v: u64) -> u64 {
+    let mut ans: u64 = 0;
+    unsafe {
+        asm!("popcnt %eax, %ebx" : "={ebx}"(ans) : "{eax}"(v));
+    }
+    ans
+}
+
+#[inline]
+pub extern "C" fn pop_count32(v: u32) -> u32 {
+    let mut ans: u32 = 0;
+    unsafe {
+        asm!("popcnt %eax, %ebx" : "={ebx}"(ans) : "{eax}"(v));
+    }
+    ans
+}
+
+#[inline]
+pub extern "C" fn pop_count16(v: u16) -> u16 {
+    let mut ans: u16 = 0;
+    unsafe {
+        asm!("popcnt %eax, %ebx" : "={ebx}"(ans) : "{eax}"(v));
+    }
+    ans
 }
 
 
@@ -113,14 +131,14 @@ mod test {
 
     #[test]
     fn pop_count() {
-        let a: u32 = 0b00000000;
-        assert_eq!(super::pop_count(a), 0);
-        let a: u32 = 0b00010000;
-        assert_eq!(super::pop_count(a), 1);
-        let a: u32 = 0b00011000;
-        assert_eq!(super::pop_count(a),  2);
-        let a: u32 = 0b10011000111101111;
-        assert_eq!(super::pop_count(a),  11);
+        let a: u64 = 0b00000000;
+        assert_eq!(super::pop_count64(a), 0);
+        let a: u64 = 0b00010000;
+        assert_eq!(super::pop_count64(a), 1);
+        let a: u64 = 0b00011000;
+        assert_eq!(super::pop_count64(a),  2);
+        let a: u64 = 0b10011000111101111;
+        assert_eq!(super::pop_count64(a),  11);
     }
 
     #[test]
