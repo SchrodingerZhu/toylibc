@@ -6,6 +6,7 @@ use simdeez::sse2::*;
 use simdeez::sse41::*;
 use simdeez::avx2::*;
 use packed_simd::u32x4;
+use crate::utils::bitwise::*;
 
 simd_compiletime_generate!(
 fn memcpy_simd(
@@ -48,60 +49,14 @@ fn memmove_simd (dst: *mut u8, src: *const u8, n: size_t) -> *mut u8 {
 }
 );
 
-pub extern "C" fn memmove (dst: *mut u8,
+pub unsafe extern "C" fn memmove (dst: *mut u8,
                           src: *const u8,
                           size: size_t) -> *mut u8 {
     memmove_simd_compiletime(dst, src, size)
 }
 
-#[inline]
-fn bsf32(data: i32) -> i32 {
-    let mut ans : i32 = 0;
-    unsafe {
-        asm!("bsf %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
-    }
-    ans
-}
 
-#[inline]
-fn bsf64(data: i64) -> i64 {
-    let mut ans : i64 = 0;
-    unsafe {
-        asm!("bsf %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
-    }
-    ans
-}
-
-#[inline]
-fn bsr32(data: i32) -> i32 {
-    let mut ans : i32 = 0;
-    unsafe {
-        asm!("bsr %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
-    }
-    ans
-}
-
-
-#[inline]
-fn bsr64(data: i64) -> i64 {
-    let mut ans : i64 = 0;
-    unsafe {
-        asm!("bsr %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
-    }
-    ans
-}
-
-#[inline]
-fn bsr16(data: i16) -> i16 {
-    let mut ans : i16 = 0;
-    unsafe {
-        asm!("bsr %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
-    }
-    ans
-}
-
-
-fn memchr_simd_avx2(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
+extern "C" fn memchr_simd_avx2(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
     unsafe {
         use core::arch::x86_64::*;
         let mut i = 0;
@@ -125,7 +80,7 @@ fn memchr_simd_avx2(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
 }
 
 
-fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
+extern "C" fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
     unsafe {
         use core::arch::x86_64::*;
         let mut i = 0;
@@ -148,7 +103,7 @@ fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
     }
 }
 
-pub extern "C" fn memchr (s: *const char_t, c: int_t, n: size_t) -> *const char_t {
+pub unsafe extern "C" fn memchr (s: *const char_t, c: int_t, n: size_t) -> *const char_t {
     if n < 32 {memchr_simd_sse(s, c, n)}
     else  {memchr_simd_avx2(s, c, n)}
 }
@@ -185,10 +140,8 @@ unsafe fn memcmp_simd_avx2(s: *const char_t, t: *const char_t, n: size_t) -> i32
     return 0;
 }
 
-pub extern "C" fn memcmp (s: *const char_t, t: *const char_t, n: size_t) -> i32 {
-    unsafe {
-        memcmp_simd_avx2(s, t, n)
-    }
+pub unsafe extern "C" fn memcmp (s: *const char_t, t: *const char_t, n: size_t) -> i32 {
+    memcmp_simd_avx2(s, t, n)
 }
 
 #[cfg(test)]
@@ -229,26 +182,24 @@ mod test {
     }
 
     #[test]
-    fn bit_scan() {
-        let mut a : i32 = 0b00010000;
-        assert_eq!(super::bsf32(a), 4);
-    }
-
-    #[test]
     fn memchr() {
-        let mut a : i32 = 0b00010000;
-        let string = b"1234123412341234";
-        let res = super::memchr(string.as_ptr() as *const i8, 0, string.len() as u64);
-        println!("{}", res as isize - string.as_ptr() as isize);
+        unsafe {
+            let a: i32 = 0b00010000;
+            let string = b"1234123412341234";
+            let res = super::memchr(string.as_ptr() as *const i8, 0, string.len() as u64);
+            println!("{}", res as isize - string.as_ptr() as isize);
+        }
     }
 
     #[test]
     fn memcmp() {
-        let a = b"12345555555555555555565555555";
-        let b = b"12345555555555555555555555555";
-        assert!(super::memcmp(a.as_ptr() as _ , b.as_ptr() as _, a.len() as _) > 0);
-        assert!(super::memcmp(b.as_ptr() as _ , a.as_ptr() as _, a.len() as _) < 0);
-        assert_eq!(super::memcmp(a.as_ptr() as _, a.as_ptr() as _, a.len() as _), 0);
+        unsafe {
+            let a = b"12345555555555555555565555555";
+            let b = b"12345555555555555555555555555";
+            assert!(super::memcmp(a.as_ptr() as _, b.as_ptr() as _, a.len() as _) > 0);
+            assert!(super::memcmp(b.as_ptr() as _, a.as_ptr() as _, a.len() as _) < 0);
+            assert_eq!(super::memcmp(a.as_ptr() as _, a.as_ptr() as _, a.len() as _), 0);
+        }
     }
 }
 
