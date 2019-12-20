@@ -1,11 +1,12 @@
 #![allow(unused_imports)]
-use crate::types::*;
+
 use simdeez::*;
+use simdeez::avx2::*;
 use simdeez::scalar::*;
 use simdeez::sse2::*;
 use simdeez::sse41::*;
-use simdeez::avx2::*;
-use packed_simd::u32x4;
+
+use crate::types::*;
 use crate::utils::bitwise::*;
 
 simd_compiletime_generate!(
@@ -26,9 +27,9 @@ size: size_t) -> *mut u8 {
 }
 );
 
-pub extern "C" fn memcpy (dst: *mut u8,
-                      src: *const u8,
-                      size: size_t) -> *mut u8 {
+pub extern "C" fn memcpy(dst: *mut u8,
+                         src: *const u8,
+                         size: size_t) -> *mut u8 {
     memcpy_simd_compiletime(dst, src, size)
 }
 
@@ -49,9 +50,9 @@ fn memmove_simd (dst: *mut u8, src: *const u8, n: size_t) -> *mut u8 {
 }
 );
 
-pub unsafe extern "C" fn memmove (dst: *mut u8,
-                          src: *const u8,
-                          size: size_t) -> *mut u8 {
+pub unsafe extern "C" fn memmove(dst: *mut u8,
+                                 src: *const u8,
+                                 size: size_t) -> *mut u8 {
     memmove_simd_compiletime(dst, src, size)
 }
 
@@ -66,7 +67,7 @@ extern "C" fn memchr_simd_avx2(s: *const char_t, c: int_t, n: size_t) -> *const 
             let r = _mm256_cmpeq_epi8(q, x);
             let z = _mm256_movemask_epi8(r);
             if z != 0 {
-                return s.add(bsf32(z) as usize + i as usize)
+                return s.add(bsf32(z) as usize + i as usize);
             }
             i += 32;
         }
@@ -90,7 +91,7 @@ extern "C" fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const c
             let r = _mm_cmpeq_epi8(q, x);
             let z = _mm_movemask_epi8(r);
             if z != 0 {
-                return s.add(bsf32(z) as usize + i as usize)
+                return s.add(bsf32(z) as usize + i as usize);
             }
             i += 16;
         }
@@ -103,9 +104,8 @@ extern "C" fn memchr_simd_sse(s: *const char_t, c: int_t, n: size_t) -> *const c
     }
 }
 
-pub unsafe extern "C" fn memchr (s: *const char_t, c: int_t, n: size_t) -> *const char_t {
-    if n < 32 {memchr_simd_sse(s, c, n)}
-    else  {memchr_simd_avx2(s, c, n)}
+pub unsafe extern "C" fn memchr(s: *const char_t, c: int_t, n: size_t) -> *const char_t {
+    if n < 32 { memchr_simd_sse(s, c, n) } else { memchr_simd_avx2(s, c, n) }
 }
 
 #[inline]
@@ -121,7 +121,7 @@ unsafe fn short_cmp(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
 
 unsafe fn memcmp_simd_avx2(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
     use core::arch::x86_64::*;
-    static MASK : size_t = 31;
+    static MASK: size_t = 31;
     let preset = MASK & n;
     let cmp = short_cmp(s, t, preset);
     if cmp != 0 {
@@ -140,7 +140,7 @@ unsafe fn memcmp_simd_avx2(s: *const char_t, t: *const char_t, n: size_t) -> i32
     return 0;
 }
 
-pub unsafe extern "C" fn memcmp (s: *const char_t, t: *const char_t, n: size_t) -> i32 {
+pub unsafe extern "C" fn memcmp(s: *const char_t, t: *const char_t, n: size_t) -> i32 {
     memcmp_simd_avx2(s, t, n)
 }
 
