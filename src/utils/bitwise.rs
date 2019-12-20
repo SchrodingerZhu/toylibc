@@ -2,7 +2,7 @@
 
 use packed_simd::{u32x4, u8x4};
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn bsf16(data: i16) -> i16 {
     let mut ans: i16 = 0;
     unsafe {
@@ -11,7 +11,7 @@ pub extern "C" fn bsf16(data: i16) -> i16 {
     ans
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn bsf32(data: i32) -> i32 {
     let mut ans: i32 = 0;
     unsafe {
@@ -20,7 +20,7 @@ pub extern "C" fn bsf32(data: i32) -> i32 {
     ans
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn bsf64(data: i64) -> i64 {
     let mut ans: i64 = 0;
     unsafe {
@@ -29,7 +29,7 @@ pub extern "C" fn bsf64(data: i64) -> i64 {
     ans
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn bsr32(data: i32) -> i32 {
     let mut ans: i32 = 0;
     unsafe {
@@ -39,7 +39,7 @@ pub extern "C" fn bsr32(data: i32) -> i32 {
 }
 
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn bsr64(data: i64) -> i64 {
     let mut ans: i64 = 0;
     unsafe {
@@ -48,7 +48,7 @@ pub extern "C" fn bsr64(data: i64) -> i64 {
     ans
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn bsr16(data: i16) -> i16 {
     let mut ans: i16 = 0;
     unsafe {
@@ -57,13 +57,13 @@ pub extern "C" fn bsr16(data: i16) -> i16 {
     ans
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn byte_parity(b: u8) -> bool {
     let b = b as u64;
     (((b * 0x0101010101010101) & 0x8040201008040201) % 0x1FF) & 1 != 0
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn pop_parity(mut b: u64) -> bool {
     b ^= b >> 1;
     b ^= b >> 2;
@@ -71,15 +71,14 @@ pub extern "C" fn pop_parity(mut b: u64) -> bool {
     (b >> 60) & 1 != 0
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn pop_reverse8(b: u8) -> u8 {
     let b = b as u64;
     (((b * 0x80200802) & 0x0884422110) * 0x0101010101 >> 32) as u8
 }
 
 
-
-#[inline]
+#[no_mangle]
 pub extern "C" fn pop_reverse(mut b: u64) -> u64 {
     let mut s = 32;
     let mut mask = 18446744073709551615;
@@ -91,7 +90,7 @@ pub extern "C" fn pop_reverse(mut b: u64) -> u64 {
     b
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn pop_count64(v: u64) -> u64 {
     let mut ans: u64 = 0;
     unsafe {
@@ -100,7 +99,7 @@ pub extern "C" fn pop_count64(v: u64) -> u64 {
     ans
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn pop_count32(v: u32) -> u32 {
     let mut ans: u32 = 0;
     unsafe {
@@ -109,7 +108,7 @@ pub extern "C" fn pop_count32(v: u32) -> u32 {
     ans
 }
 
-#[inline]
+#[no_mangle]
 pub extern "C" fn pop_count16(v: u16) -> u16 {
     let mut ans: u16 = 0;
     unsafe {

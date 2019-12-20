@@ -1,3 +1,4 @@
+pub use functions::*;
+
 mod functions;
 
-pub use functions::*;

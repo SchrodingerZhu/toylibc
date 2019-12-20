@@ -14,7 +14,7 @@ panic = "abort"
 packed_simd = "0.3.3"
 spin = "0.5.2"
 syscalls = "0.1.4"
-
+libm = "0.2.1"
 
 [dependencies.num-complex]
 version = "0.2"
