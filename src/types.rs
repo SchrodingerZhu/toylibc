@@ -204,3 +204,17 @@ pub struct tm {
     pub tm_gmtoff: long_t,
     pub tm_zone: *const char_t,
 }
+
+pub type clock_t = longlong_t;
+pub type time_t = i64;
+pub type clockid_t = int_t;
+
+#[repr(C)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+pub struct timespec {
+    pub tv_sec: time_t,
+    pub tv_nsec: long_t,
+}
+
+pub type tv_nsec_t = long_t;
+
