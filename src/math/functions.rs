@@ -23,4 +23,15 @@ generate!(atan2f(x : f32, y : f32) -> f32);
 generate!(atanf(x : f32) -> f32);
 generate!(atanh(x : f64) -> f64);
 generate!(atanhf(x : f32) -> f32);
-
+generate!(cbrt(x: f64) -> f64);
+generate!(cbrtf(x: f32) -> f32);
+generate!(ceil(x: f64) -> f64);
+generate!(ceilf(x: f32) -> f32);
+generate!(copysign(x: f64, y: f64) -> f64);
+generate!(copysignf(x: f32, y: f32) -> f32);
+generate!(cos(x: f64) -> f64);
+generate!(cosf(x: f32) -> f32);
+generate!(cosh(x: f64) -> f64);
+generate!(coshf(x: f32) -> f32);
+generate!(erf(x: f64) -> f64);
+generate!(erfc(x: f64) -> f64);

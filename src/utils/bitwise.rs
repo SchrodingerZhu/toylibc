@@ -4,7 +4,7 @@ use packed_simd::{u32x4, u8x4};
 
 #[no_mangle]
 pub extern "C" fn bsf16(data: i16) -> i16 {
-    let mut ans: i16 = 0;
+    let mut ans: i16;
     unsafe {
         asm!("bsf %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
     }
@@ -13,7 +13,7 @@ pub extern "C" fn bsf16(data: i16) -> i16 {
 
 #[no_mangle]
 pub extern "C" fn bsf32(data: i32) -> i32 {
-    let mut ans: i32 = 0;
+    let mut ans: i32;
     unsafe {
         asm!("bsf %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
     }
@@ -22,7 +22,7 @@ pub extern "C" fn bsf32(data: i32) -> i32 {
 
 #[no_mangle]
 pub extern "C" fn bsf64(data: i64) -> i64 {
-    let mut ans: i64 = 0;
+    let mut ans: i64;
     unsafe {
         asm!("bsf %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
     }
@@ -31,7 +31,7 @@ pub extern "C" fn bsf64(data: i64) -> i64 {
 
 #[no_mangle]
 pub extern "C" fn bsr32(data: i32) -> i32 {
-    let mut ans: i32 = 0;
+    let mut ans: i32;
     unsafe {
         asm!("bsr %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
     }
@@ -41,7 +41,7 @@ pub extern "C" fn bsr32(data: i32) -> i32 {
 
 #[no_mangle]
 pub extern "C" fn bsr64(data: i64) -> i64 {
-    let mut ans: i64 = 0;
+    let mut ans: i64;
     unsafe {
         asm!("bsr %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
     }
@@ -50,7 +50,7 @@ pub extern "C" fn bsr64(data: i64) -> i64 {
 
 #[no_mangle]
 pub extern "C" fn bsr16(data: i16) -> i16 {
-    let mut ans: i16 = 0;
+    let mut ans: i16;
     unsafe {
         asm!("bsr %eax, %ebx" : "={ebx}"(ans) : "{eax}"(data));
     }
@@ -92,7 +92,7 @@ pub extern "C" fn pop_reverse(mut b: u64) -> u64 {
 
 #[no_mangle]
 pub extern "C" fn pop_count64(v: u64) -> u64 {
-    let mut ans: u64 = 0;
+    let mut ans: u64;
     unsafe {
         asm!("popcnt %eax, %ebx" : "={ebx}"(ans) : "{eax}"(v));
     }
@@ -101,7 +101,7 @@ pub extern "C" fn pop_count64(v: u64) -> u64 {
 
 #[no_mangle]
 pub extern "C" fn pop_count32(v: u32) -> u32 {
-    let mut ans: u32 = 0;
+    let mut ans: u32;
     unsafe {
         asm!("popcnt %eax, %ebx" : "={ebx}"(ans) : "{eax}"(v));
     }
@@ -110,7 +110,7 @@ pub extern "C" fn pop_count32(v: u32) -> u32 {
 
 #[no_mangle]
 pub extern "C" fn pop_count16(v: u16) -> u16 {
-    let mut ans: u16 = 0;
+    let mut ans: u16;
     unsafe {
         asm!("popcnt %eax, %ebx" : "={ebx}"(ans) : "{eax}"(v));
     }
