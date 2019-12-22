@@ -126,7 +126,7 @@ impl ThreadParker {
                 (FUTEX_WAIT | FUTEX_PRIVATE_FLAG) as _,
                 1,
                 ts_ptr as _,
-            ).unwrap() // TODO: wrap this to transform errno
+            );
         };
     }
 }
