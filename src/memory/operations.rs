@@ -222,7 +222,6 @@ mod test {
     #[test]
     fn memchr() {
         unsafe {
-            let a: i32 = 0b00010000;
             let string = b"1234123412341234";
             let res = super::memchr(string.as_ptr() as *const i8, 0, string.len() as u64);
             println!("{}", res as isize - string.as_ptr() as isize);

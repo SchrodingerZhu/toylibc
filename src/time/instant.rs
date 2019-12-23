@@ -1,8 +1,5 @@
-use core::fmt;
 use core::ops::*;
 use core::time::Duration;
-
-use crate::constants::*;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Instant(super::sys::Instant);

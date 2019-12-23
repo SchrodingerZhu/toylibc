@@ -9,8 +9,6 @@
 
 #![cfg_attr(not(test), no_std)]
 extern crate alloc;
-#[macro_use]
-extern crate lazy_static;
 
 pub use complex::*;
 pub use io::*;

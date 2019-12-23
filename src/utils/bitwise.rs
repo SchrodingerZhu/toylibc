@@ -81,7 +81,7 @@ pub extern "C" fn pop_reverse(mut b: u64) -> u64 {
     let mut s = 32;
     let mut mask = 18446744073709551615;
     while s > 0 {
-        mask ^= (mask << s);
+        mask ^= mask << s;
         b = ((b >> s) & mask) | ((b << s) & !mask);
         s >>= 1;
     }

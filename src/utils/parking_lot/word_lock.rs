@@ -1,11 +1,8 @@
-use alloc::sync::Arc;
 use core::{
     cell::Cell,
     mem, ptr,
     sync::atomic::{AtomicUsize, fence, Ordering},
 };
-
-use spin::Mutex;
 
 use crate::utils::parking_lot::{ThreadParker, ThreadParkerT};
 use crate::utils::parking_lot::spinwait::SpinWait;

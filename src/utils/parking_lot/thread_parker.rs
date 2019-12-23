@@ -120,13 +120,13 @@ impl ThreadParker {
             .map(|ts_ref| ts_ref as *const _)
             .unwrap_or(0 as _);
         unsafe {
-            syscall4(
+            match syscall4(
                 SYS_futex,
                 &self.futex as *const _ as _,
                 (FUTEX_WAIT | FUTEX_PRIVATE_FLAG) as _,
                 1,
                 ts_ptr as _,
-            );
+            ) { _ => () };
         };
     }
 }

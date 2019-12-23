@@ -3,6 +3,7 @@ pub use elision::*;
 pub use mutex::*;
 pub use parking_lot_core::*;
 pub use raw_mutex::*;
+pub use rwlock::*;
 pub use thread_parker::*;
 
 mod raw_mutex;
