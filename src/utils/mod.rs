@@ -3,5 +3,5 @@ pub use cpu::*;
 
 mod bitwise;
 mod cpu;
-mod parking_lot;
+pub mod parking_lot;
 

@@ -24,7 +24,7 @@ mod panic;
 mod complex;
 mod memory;
 mod types;
-mod utils;
+pub mod utils;
 mod math;
 mod io;
 mod posix;
