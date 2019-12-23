@@ -159,19 +159,16 @@ impl ThreadData {
     }
 }
 
-unsafe impl Send for ThreadData {}
-lazy_static! {
-    static ref TABLE : ThreadLocal<ThreadData> = ThreadLocal::new();
-}
+#[thread_local]
+static mut THREAD_DATA: Option<ThreadData> = None;
 // Invokes the given closure with a reference to the current thread `ThreadData`.
-#[inline(always)]
+#[inline]
 fn with_thread_data<T>(f: impl FnOnce(&ThreadData) -> T) -> T {
-    // Unlike word_lock::ThreadData, parking_lot::ThreadData is always expensive
-    // to construct. Try to use a thread-local version if possible. Otherwise just
-    // create a ThreadData on the stack
     unsafe {
-        let thread_data_ptr = TABLE.get_or(ThreadData::new);
-        f(thread_data_ptr)
+        if THREAD_DATA.is_none() {
+            THREAD_DATA.replace(ThreadData::new());
+        }
+        f(THREAD_DATA.as_ref().unwrap())
     }
 }
 
@@ -1063,11 +1060,11 @@ pub mod deadlock {
     pub(super) use super::deadlock_impl::DeadlockData;
 
     /// Acquire a resource identified by key in the deadlock detector
-        /// Noop if deadlock_detection feature isn't enabled.
-        ///
-        /// # Safety
-        ///
-        /// Call after the resource is acquired
+            /// Noop if deadlock_detection feature isn't enabled.
+            ///
+            /// # Safety
+            ///
+            /// Call after the resource is acquired
     #[inline]
     pub unsafe fn acquire_resource(_key: usize) {
         #[cfg(feature = "deadlock_detection")]

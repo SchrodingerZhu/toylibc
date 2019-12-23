@@ -5,6 +5,8 @@
 #![crate_type = "cdylib"]
 #![allow(dead_code)]
 #![feature(asm)]
+#![feature(thread_local)]
+
 #![cfg_attr(not(test), no_std)]
 extern crate alloc;
 #[macro_use]

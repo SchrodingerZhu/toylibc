@@ -1,3 +1,4 @@
+use alloc::sync::Arc;
 use core::{
     cell::Cell,
     mem, ptr,
@@ -44,16 +45,16 @@ impl ThreadData {
     }
 }
 
-unsafe impl Send for ThreadData {}
-lazy_static! {
-static ref TABLE : ThreadLocal<ThreadData> = ThreadLocal::new();
-}
+#[thread_local]
+static mut THREAD_DATA: Option<ThreadData> = None;
 // Invokes the given closure with a reference to the current thread `ThreadData`.
 #[inline]
 fn with_thread_data<T>(f: impl FnOnce(&ThreadData) -> T) -> T {
     unsafe {
-        let thread_data = TABLE.get_or(ThreadData::new);
-        f(thread_data)
+        if THREAD_DATA.is_none() {
+            THREAD_DATA.replace(ThreadData::new());
+        }
+        f(THREAD_DATA.as_ref().unwrap())
     }
 }
 

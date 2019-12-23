@@ -41,3 +41,5 @@ pub const CLOCK_MONOTONIC_COARSE: clockid_t = 6;
 pub const CLOCK_BOOTTIME: clockid_t = 7;
 pub const CLOCK_REALTIME_ALARM: clockid_t = 8;
 pub const CLOCK_BOOTTIME_ALARM: clockid_t = 9;
+
+pub const INT_MAX: int_t = 2147483647;
