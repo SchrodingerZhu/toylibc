@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#![allow(non_upper_case_globals)]
 
 use crate::types::*;
 
@@ -43,3 +44,49 @@ pub const CLOCK_REALTIME_ALARM: clockid_t = 8;
 pub const CLOCK_BOOTTIME_ALARM: clockid_t = 9;
 
 pub const INT_MAX: int_t = 2147483647;
+
+pub const IPCOP_semop: int_t = 1;
+pub const IPCOP_semget: int_t = 2;
+pub const IPCOP_semctl: int_t = 3;
+pub const IPCOP_msgsnd: int_t = 11;
+pub const IPCOP_msgrcv: int_t = 12;
+pub const IPCOP_msgget: int_t = 13;
+pub const IPCOP_msgctl: int_t = 14;
+pub const IPCOP_shmat: int_t = 21;
+pub const IPCOP_shmdt: int_t = 22;
+pub const IPCOP_shmget: int_t = 23;
+pub const IPCOP_shmctl: int_t = 24;
+pub const IPC_STAT: int_t = 2;
+pub const IPC_MODERN: int_t = 0x100;
+
+
+pub const INT8_MIN: int8_t = core::i8::MIN;
+pub const INT16_MIN: int16_t = core::i16::MIN;
+pub const INT32_MIN: int32_t = core::i32::MIN;
+pub const INT64_MIN: int64_t = core::i64::MIN;
+
+pub const INT8_MAX: int8_t = 0x7f;
+pub const INT16_MAX: int16_t = 0x7fff;
+pub const INT32_MAX: int32_t = 0x7fffffff;
+pub const INT64_MAX: int64_t = 0x7fffffffffffffff;
+pub const UINT8_MAX: uint8_t = 0xff;
+pub const UINT16_MAX: uint32_t = 0xffff;
+pub const UINT32_MAX: uint32_t = 0xffffffff;
+pub const UINT64_MAX: uint64_t = 0xffffffffffffffff;
+
+
+pub const INT_FAST16_MIN: int_fast16_t = INT32_MIN as _;
+pub const INT_FAST32_MIN: int_fast32_t = INT32_MIN;
+
+pub const INT_FAST16_MAX: int_fast16_t = INT32_MAX as _;
+pub const INT_FAST32_MAX: int_fast32_t = INT32_MAX;
+
+pub const UINT_FAST16_MAX: uint_fast16_t = UINT32_MAX as _;
+pub const UINT_FAST32_MAX: uint_fast32_t = UINT32_MAX;
+
+pub const INTPTR_MIN: intptr_t = INT64_MIN;
+pub const INTPTR_MAX: intptr_t = INT64_MAX;
+pub const UINTPTR_MAX: uintptr_t = UINT64_MAX as _;
+pub const PTRDIFF_MIN: ptrdiff_t = INT64_MIN;
+pub const PTRDIFF_MAX: ptrdiff_t = INT64_MAX;
+pub const SIZE_MAX: size_t = UINT64_MAX as _;

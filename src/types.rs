@@ -1,19 +1,22 @@
 #![allow(non_camel_case_types)]
-pub type errno_t = u8;
-pub type char_t     = i8;
-pub type uchar_t    = u8;
-pub type short_t    = i16;
-pub type ushort_t   = u16;
-pub type int_t      = i32;
-pub type uint_t     = u32;
-pub type long_t     = i64;
-pub type longlong_t = i64;
-pub type ulong_t    = u64;
-pub type ulonglong_t= i64;
 
+pub type errno_t = u8;
+pub type char_t = i8;
+pub type uchar_t = u8;
+pub type short_t = i16;
+pub type ushort_t = u16;
+pub type int_t = i32;
+pub type uint_t = u32;
+pub type long_t = i64;
+pub type longlong_t = i64;
+pub type ulong_t = u64;
+pub type ulonglong_t = u64;
+pub type off_t = i64;
+pub type key_t = int_t;
+pub type rlim_t = u64;
 // stddef
-pub type ssize_t   = long_t;
-pub type size_t    = ulong_t;
+pub type ssize_t = long_t;
+pub type size_t = ulong_t;
 pub type ptrdiff_t = long_t;
 
 // stdint
@@ -43,7 +46,7 @@ pub type uint_fast32_t = uint32_t;
 pub type uint_fast64_t = uint64_t;
 pub type intptr_t = long_t;
 pub type uintptr_t = ulong_t;
-pub type intmax_t  = long_t;
+pub type intmax_t = long_t;
 pub type uintmax_t = ulong_t;
 
 #[repr(u8)]
@@ -52,8 +55,8 @@ pub enum void_t {
     __variant2,
 }
 
-pub type __kernel_size_t    = ulong_t;
-pub type __kernel_ssize_t   = long_t;
+pub type __kernel_size_t = ulong_t;
+pub type __kernel_ssize_t = long_t;
 pub type __kernel_ptrdiff_t = long_t;
 
 pub const NSIG_BPW: usize = 64;
@@ -75,16 +78,16 @@ pub struct stat {
     pub st_uid: uint_t,
     pub st_gid: uint_t,
     pub __pad0: uint_t,
-    pub st_rdev:    ulong_t,
-    pub st_size:    long_t,
+    pub st_rdev: ulong_t,
+    pub st_size: long_t,
     pub st_blksize: long_t,
-    pub st_blocks:  long_t,
+    pub st_blocks: long_t,
 
-    pub st_atime:      ulong_t,
+    pub st_atime: ulong_t,
     pub st_atime_nsec: ulong_t,
-    pub st_mtime:      ulong_t,
+    pub st_mtime: ulong_t,
     pub st_mtime_nsec: ulong_t,
-    pub st_ctime:      ulong_t,
+    pub st_ctime: ulong_t,
     pub st_ctime_nsec: ulong_t,
     pub __unused: [long_t; 3],
 }
@@ -162,6 +165,7 @@ pub const FD_SETSIZE: usize = 1024;
 
 #[no_mangle]
 pub static __FD_SETSIZE: usize = FD_SETSIZE;
+
 pub struct __kernel_fd_set {
     // XXX size_of
     pub fds_bits: [ulong_t; (FD_SETSIZE / (8 * 8))],
@@ -169,7 +173,7 @@ pub struct __kernel_fd_set {
 
 pub struct getcpu_cache {
     // XXX size_of
-    pub blob: [ulong_t; 128/8],
+    pub blob: [ulong_t; 128 / 8],
 }
 
 pub struct sysinfo {
@@ -187,7 +191,7 @@ pub struct sysinfo {
     pub freehigh: ulong_t,
     pub mem_unit: u32,
     // XXX size_of
-    pub _f: [char_t; 20-2*8-4],
+    pub _f: [char_t; 20 - 2 * 8 - 4],
 }
 
 #[repr(C)]
@@ -218,3 +222,9 @@ pub struct timespec {
 
 pub type tv_nsec_t = long_t;
 
+#[repr(C)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+pub struct rlimit {
+    rlim_cur: rlim_t,
+    rlim_max: rlim_t,
+}

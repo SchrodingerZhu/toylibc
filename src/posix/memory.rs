@@ -38,5 +38,38 @@ pub unsafe extern fn sbrk(increment: intptr_t) -> *const void_t {
     }
 }
 
+#[no_mangle]
+pub unsafe extern fn getrlimit(resource: int_t, rlim: *mut rlimit) -> int_t {
+    match syscall2(SYS_getrlimit, resource as _, rlim as _) {
+        Ok(res) => res as _,
+        Err(code) => {
+            errno = code as _;
+            -1
+        }
+    }
+}
+
+#[no_mangle]
+pub unsafe extern fn mmap(addr: *mut u8, length: size_t, prot: int_t, flags: int_t, fd: int_t, offset: off_t) -> *const void_t {
+    match syscall6(SYS_mmap, addr as _, length as _, prot as _, flags as _, fd as _, offset as _) {
+        Ok(res) => res as _,
+        Err(code) => {
+            errno = code as _;
+            (0b11111111) as *const void_t
+        }
+    }
+}
+
+#[no_mangle]
+pub unsafe extern fn munmap(addr: *const void_t, length: size_t) -> int_t {
+    match syscall2(SYS_munmap, addr as ulong_t, length) {
+        Ok(res) => res as _,
+        Err(code) => {
+            errno = code as _;
+            -1
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {}
