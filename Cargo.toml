@@ -20,6 +20,7 @@ lock_api = "0.3.2"
 smallvec = "1.1.0"
 time = { version = "0.2", default-features = false }
 
+
 [dependencies.num-complex]
 version = "0.2"
 default-features = false
@@ -38,3 +39,6 @@ version = "1.0.0"
 [package.metadata.cargo-xbuild]
 memcpy = false
 
+[lib]
+name = "c"
+crate-type = ["staticlib"]
