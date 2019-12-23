@@ -10,9 +10,8 @@ use core::time::Duration;
 use smallvec::SmallVec;
 
 use crate::time::Instant;
+use crate::utils::parking_lot::util::UncheckedOptionExt;
 use crate::utils::parking_lot::word_lock::WordLock;
-use crate::utils::thread_local::{CachedThreadLocal, ThreadLocal};
-use crate::utils::thread_local::unreachable::UncheckedOptionExt;
 
 use super::*;
 
@@ -1060,11 +1059,11 @@ pub mod deadlock {
     pub(super) use super::deadlock_impl::DeadlockData;
 
     /// Acquire a resource identified by key in the deadlock detector
-            /// Noop if deadlock_detection feature isn't enabled.
-            ///
-            /// # Safety
-            ///
-            /// Call after the resource is acquired
+                /// Noop if deadlock_detection feature isn't enabled.
+                ///
+                /// # Safety
+                ///
+                /// Call after the resource is acquired
     #[inline]
     pub unsafe fn acquire_resource(_key: usize) {
         #[cfg(feature = "deadlock_detection")]

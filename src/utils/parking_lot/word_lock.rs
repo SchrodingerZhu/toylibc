@@ -10,7 +10,6 @@ use spin::Mutex;
 use crate::utils::parking_lot::{ThreadParker, ThreadParkerT};
 use crate::utils::parking_lot::spinwait::SpinWait;
 use crate::utils::parking_lot::thread_parker::UnparkHandleT;
-use crate::utils::thread_local::ThreadLocal;
 
 struct ThreadData {
     parker: ThreadParker,
