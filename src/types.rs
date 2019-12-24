@@ -228,3 +228,56 @@ pub struct rlimit {
     rlim_cur: rlim_t,
     rlim_max: rlim_t,
 }
+
+
+pub type pid_t = i32;
+pub type uid_t = u32;
+pub type gid_t = u32;
+pub type in_addr_t = u32;
+pub type in_port_t = u16;
+pub type sighandler_t = size_t;
+pub type cc_t = uchar_t;
+pub type useconds_t = u32;
+pub type dev_t = u64;
+pub type socklen_t = u32;
+pub type mode_t = u32;
+pub type ino64_t = u64;
+pub type off64_t = i64;
+pub type blkcnt64_t = i64;
+pub type rlim64_t = u64;
+pub type mqd_t = int_t;
+pub type nfds_t = ulong_t;
+pub type nl_item = int_t;
+pub type idtype_t = uint_t;
+pub type loff_t = longlong_t;
+pub type pthread_key_t = uint_t;
+
+#[repr(C)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+pub struct ipc_perm {
+    pub __ipc_perm_key: key_t,
+    pub uid: uid_t,
+    pub gid: gid_t,
+    pub cuid: uid_t,
+    pub cgid: gid_t,
+    pub mode: mode_t,
+    pub __ipc_perm_seq: int_t,
+    __pad1: long_t,
+    __pad2: long_t,
+}
+
+#[repr(C)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+pub struct shmid_ds {
+    pub shm_perm: ipc_perm,
+    pub shm_segsz: size_t,
+    pub shm_atime: time_t,
+    pub shm_dtime: time_t,
+    pub shm_ctime: time_t,
+    pub shm_cpid: pid_t,
+    pub shm_lpid: pid_t,
+    pub shm_nattch: ulong_t,
+    __pad1: long_t,
+    __pad2: long_t,
+}
+

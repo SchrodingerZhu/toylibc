@@ -43,7 +43,7 @@ pub const CLOCK_BOOTTIME: clockid_t = 7;
 pub const CLOCK_REALTIME_ALARM: clockid_t = 8;
 pub const CLOCK_BOOTTIME_ALARM: clockid_t = 9;
 
-pub const INT_MAX: int_t = 2147483647;
+
 
 pub const IPCOP_semop: int_t = 1;
 pub const IPCOP_semget: int_t = 2;
@@ -57,22 +57,25 @@ pub const IPCOP_shmdt: int_t = 22;
 pub const IPCOP_shmget: int_t = 23;
 pub const IPCOP_shmctl: int_t = 24;
 pub const IPC_STAT: int_t = 2;
+pub const IPC_64: int_t = 0;
 pub const IPC_MODERN: int_t = 0x100;
+pub const IPC_TIME64: int_t = (IPC_STAT & 0x100);
 
 
+pub const INT_MAX: int_t = 2147483647;
 pub const INT8_MIN: int8_t = core::i8::MIN;
 pub const INT16_MIN: int16_t = core::i16::MIN;
 pub const INT32_MIN: int32_t = core::i32::MIN;
 pub const INT64_MIN: int64_t = core::i64::MIN;
 
-pub const INT8_MAX: int8_t = 0x7f;
-pub const INT16_MAX: int16_t = 0x7fff;
-pub const INT32_MAX: int32_t = 0x7fffffff;
-pub const INT64_MAX: int64_t = 0x7fffffffffffffff;
-pub const UINT8_MAX: uint8_t = 0xff;
-pub const UINT16_MAX: uint32_t = 0xffff;
-pub const UINT32_MAX: uint32_t = 0xffffffff;
-pub const UINT64_MAX: uint64_t = 0xffffffffffffffff;
+pub const INT8_MAX: int8_t = core::i8::MAX;
+pub const INT16_MAX: int16_t = core::i16::MAX;
+pub const INT32_MAX: int32_t = core::i32::MAX;
+pub const INT64_MAX: int64_t = core::i64::MAX;
+pub const UINT8_MAX: uint8_t = core::u8::MAX;
+pub const UINT16_MAX: uint16_t = core::u16::MAX;
+pub const UINT32_MAX: uint32_t = core::u32::MAX;
+pub const UINT64_MAX: uint64_t = core::u64::MAX;
 
 
 pub const INT_FAST16_MIN: int_fast16_t = INT32_MIN as _;
