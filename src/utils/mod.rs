@@ -6,4 +6,5 @@ mod cpu;
 
 pub mod futex;
 pub mod parking_lot;
+pub mod barrier;
 

@@ -93,3 +93,4 @@ pub const UINTPTR_MAX: uintptr_t = UINT64_MAX as _;
 pub const PTRDIFF_MIN: ptrdiff_t = INT64_MIN;
 pub const PTRDIFF_MAX: ptrdiff_t = INT64_MAX;
 pub const SIZE_MAX: size_t = UINT64_MAX as _;
+pub const IOV_MAX: size_t = INT_MAX as u64;

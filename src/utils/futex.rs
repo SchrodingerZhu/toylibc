@@ -1,45 +1,38 @@
 use core::cell::UnsafeCell;
+use core::intrinsics::*;
 use core::ops::*;
-use core::sync::atomic::AtomicBool;
-use core::sync::atomic::AtomicUsize;
-use core::sync::atomic::Ordering::SeqCst;
 
 use syscalls::*;
 
 use crate::constants::*;
 
 #[repr(C)]
-struct RawFutex {
-    locked: AtomicBool,
-    waiter: AtomicUsize,
-}
+pub struct RawFutex(pub u8, pub usize);
 
 impl RawFutex {
     #[inline(always)]
-    fn wait(&self) {
-        for _ in 0..100 {
-            if self.waiter.load(SeqCst) == 0 && !self.locked.load(SeqCst) {
-                return;
-            }
-            unsafe {
+    pub fn wait(&self) {
+        unsafe {
+            for _ in 0..100 {
+                if atomic_load(&self.1 as *const _) == 0usize && atomic_load(&self.0 as *const _) == 0u8 {
+                    return;
+                }
                 crate::thread_yield();
                 core::sync::atomic::spin_loop_hint();
             }
-        }
-        self.waiter.fetch_add(1, SeqCst);
-        unsafe {
-            match syscall4(SYS_futex, &self.locked as *const AtomicBool as _, (FUTEX_WAIT | FUTEX_PRIVATE_FLAG) as _, 1, 0) {
+            atomic_xadd(&self.1 as *const _ as *mut _, 1);
+            match syscall4(SYS_futex, &self.0 as *const u8 as _, (FUTEX_WAIT | FUTEX_PRIVATE_FLAG) as _, 1, 0) {
                 _ => ()
             }
+            atomic_xsub(&self.1 as *const _ as *mut _, 1);
         }
-        self.waiter.fetch_sub(1, SeqCst);
     }
 
     #[inline(always)]
-    fn lock(&self) {
+    pub fn lock(&self) {
         self.wait();
-        while self.locked.compare_exchange(false, true, SeqCst, SeqCst).is_err() {
-            unsafe {
+        unsafe {
+            while let (_, false) = atomic_cxchg(&self.0 as *const _ as *mut _, 0, 1) {
                 crate::thread_yield();
                 core::sync::atomic::spin_loop_hint();
             }
@@ -47,16 +40,17 @@ impl RawFutex {
     }
 
     #[inline(always)]
-    fn unlock(&self) {
-        self.locked.store(false, SeqCst);
+    pub fn unlock(&self) {
         unsafe {
-            match syscall3(SYS_futex, &self.locked as *const AtomicBool as _, (FUTEX_WAKE | FUTEX_PRIVATE_FLAG) as _, 1) {
+            atomic_store(&self.0 as *const _ as *mut _, 0);
+            match syscall3(SYS_futex, &self.0 as *const _ as _, (FUTEX_WAKE | FUTEX_PRIVATE_FLAG) as _, 1) {
                 _ => ()
             }
         }
     }
 }
 
+#[repr(C)]
 pub struct FutexGuard<'a, T> {
     ele: &'a mut T,
     __inner: &'a RawFutex,
@@ -82,6 +76,7 @@ impl<'a, T> DerefMut for FutexGuard<'a, T> {
     }
 }
 
+#[repr(C)]
 pub struct Futex<T> {
     __inner: RawFutex,
     element: UnsafeCell<T>,
@@ -102,10 +97,7 @@ impl<T> Futex<T> {
 
     pub fn new(x: T) -> Self {
         Futex {
-            __inner: RawFutex {
-                locked: AtomicBool::new(false),
-                waiter: AtomicUsize::new(0),
-            },
+            __inner: RawFutex(0, 0),
             element: UnsafeCell::new(x),
         }
     }
