@@ -20,15 +20,12 @@ impl RawFutex {
     #[inline(always)]
     fn wait(&self) {
         for _ in 0..100 {
-            if self.waiter.load(Ordering::SeqCst) == 0 {
-                if self.locked.load(Ordering::SeqCst) {
-                    unsafe {
-                        crate::thread_yield();
-                        core::sync::atomic::spin_loop_hint();
-                    }
-                } else {
-                    return;
-                }
+            if self.waiter.load(Ordering::SeqCst) == 0 && !self.locked.load(Ordering::SeqCst) {
+                return;
+            }
+            unsafe {
+                crate::thread_yield();
+                core::sync::atomic::spin_loop_hint();
             }
         }
         self.waiter.fetch_add(1, SeqCst);
@@ -44,7 +41,10 @@ impl RawFutex {
     fn lock(&self) {
         self.wait();
         while self.locked.compare_exchange(false, true, SeqCst, SeqCst).is_err() {
-            core::sync::atomic::spin_loop_hint();
+            unsafe {
+                crate::thread_yield();
+                core::sync::atomic::spin_loop_hint();
+            }
         }
     }
 
@@ -59,7 +59,7 @@ impl RawFutex {
     }
 }
 
-struct FutexGuard<'a, T> {
+pub struct FutexGuard<'a, T> {
     ele: &'a mut T,
     __inner: &'a RawFutex,
 }
