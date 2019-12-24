@@ -57,6 +57,7 @@ impl RawFutex {
     }
 }
 
+#[repr(C)]
 pub struct FutexGuard<'a, T> {
     ele: &'a mut T,
     __inner: &'a RawFutex,
@@ -82,6 +83,7 @@ impl<'a, T> DerefMut for FutexGuard<'a, T> {
     }
 }
 
+#[repr(C)]
 pub struct Futex<T> {
     __inner: RawFutex,
     element: UnsafeCell<T>,
