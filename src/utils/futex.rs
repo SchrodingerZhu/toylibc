@@ -1,9 +1,7 @@
 use core::cell::UnsafeCell;
-use core::intrinsics::*;
 use core::ops::*;
 use core::sync::atomic::AtomicBool;
 use core::sync::atomic::AtomicUsize;
-use core::sync::atomic::Ordering;
 use core::sync::atomic::Ordering::SeqCst;
 
 use syscalls::*;
@@ -20,7 +18,7 @@ impl RawFutex {
     #[inline(always)]
     fn wait(&self) {
         for _ in 0..100 {
-            if self.waiter.load(Ordering::SeqCst) == 0 && !self.locked.load(Ordering::SeqCst) {
+            if self.waiter.load(SeqCst) == 0 && !self.locked.load(SeqCst) {
                 return;
             }
             unsafe {
@@ -123,7 +121,7 @@ mod test {
     fn futex() {
         let mutex = Arc::new(super::Futex::new(0));
         let mut vec = Vec::new();
-        for i in 0..1000 {
+        for _ in 0..1000 {
             let mutex = mutex.clone();
             vec.push(std::thread::spawn(move || {
                 std::thread::sleep(Duration::from_secs(1));
