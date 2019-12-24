@@ -118,7 +118,7 @@ mod test {
     use std::time::Duration;
 
     #[test]
-    fn futex() {
+    fn futex_1() {
         let mutex = Arc::new(super::Futex::new(0));
         let mut vec = Vec::new();
         for _ in 0..1000 {
@@ -134,5 +134,24 @@ mod test {
         }
         let v = mutex.lock();
         assert_eq!(*v, 1000);
+    }
+
+    #[test]
+    fn futex_2() {
+        let mutex = Arc::new(super::Futex::new(0));
+        let mut vec = Vec::new();
+        for _ in 0..10 {
+            let mutex = mutex.clone();
+            vec.push(std::thread::spawn(move || {
+                let mut m = mutex.lock();
+                std::thread::sleep(Duration::from_millis(300));
+                *m += 1;
+            }))
+        }
+        for i in vec {
+            i.join().unwrap();
+        }
+        let v = mutex.lock();
+        assert_eq!(*v, 10);
     }
 }
