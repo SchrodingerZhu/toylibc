@@ -4,7 +4,9 @@ static mut VM_LOCK: RawFutex = RawFutex(0, 0);
 
 #[no_mangle]
 pub unsafe extern "C" fn __vm_wait() {
-    VM_LOCK.wait();
+    while core::intrinsics::atomic_load(&VM_LOCK.0 as *const _) != 0 {
+        VM_LOCK.wait();
+    }
 }
 
 

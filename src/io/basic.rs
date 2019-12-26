@@ -6,7 +6,27 @@ use crate::c_style::*;
 use crate::types::*;
 
 #[repr(C)]
-pub struct FILE {}
+pub struct _IO_FILE {
+    _IO_read_ptr: *const u8,
+    /* Current read pointer */
+    _IO_read_end: *const u8,
+    /* End of get area. */
+    _IO_read_base: *const u8,
+    /* Start of putback and get area. */
+    _IO_write_base: *mut u8,
+    /* Start of put area. */
+    _IO_write_ptr: *mut u8,
+    /* Current put pointer. */
+    _IO_write_end: *mut u8,
+    /* End of put area. */
+    _IO_buf_base: *mut u8,
+    /* Start of reserve area. */
+    _IO_buf_end: *mut u8,
+    /* End of reserve area. */
+    _fileno: int_t,
+    _blksize: int_t,
+}
+
 
 #[repr(C)]
 pub struct iovec {
